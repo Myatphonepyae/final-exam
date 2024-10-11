@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="home">
+        <h1>Welcome to Customer Management</h1>
+        <button onclick="showCustomerList()">Manage Customers</button>
+    </div>
+
+    <div id="customerList" class="hidden">
+        <h2>Customer List</h2>
+        <button onclick="showAddCustomer()">Add New Customer</button>
+        <ul id="customers"></ul>
+    </div>
+
+    <div id="addCustomer" class="hidden">
+        <h2>Add New Customer</h2>
+        <form id="customerForm" onsubmit="addCustomer(event)">
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="date" id="dateOfBirth" required>
+            <input type="number" id="memberNumber" placeholder="Member Number" required>
+            <input type="text" id="interests" placeholder="Interests">
+            <button type="submit">Add Customer</button>
+        </form>
+        <button onclick="showCustomerList()">Back to List</button>
+    </div>
+
+    <div id="customerDetail" class="hidden">
+        <h2>Customer Detail</h2>
+        <p id="detailName"></p>
+        <p id="detailDOB"></p>
+        <p id="detailMemberNumber"></p>
+        <p id="detailInterests"></p>
+        <button onclick="showCustomerList()">Back to List</button>
+    </div>
+
+    <script>
+        let customers = [];
+        let customerId = 0;
+
+        const showCustomerList = () => {
+            document.getElementById("home").classList.add("hidden");
+            document.getElementById("customerList").classList.remove("hidden");
+            document.getElementById("addCustomer").classList.add("hidden");
+            document.getElementById("customerDetail").classList.add("hidden");
+            displayCustomers();
+        };
+
+        const showAddCustomer = () => {
+            document.getElementById("home").classList.add("hidden");
+            document.getElementById("customerList").classList.add("hidden");
+            document.getElementById("addCustomer").classList.remove("hidden");
+            document.getElementById("customerDetail").classList.add("hidden");
+        };
+
+        const addCustomer = (event) => {
+            event.preventDefault();
+            const name = document.getElementById("name").value;
+            const dateOfBirth = document.getElementById("dateOfBirth").value;
+            const memberNumber = document.getElementById("memberNumber").value;
+            const interests = document.getElementById("interests").value;
+
+            const newCustomer = { id: customerId++, name, dateOfBirth, memberNumber, interests };
+            customers.push(newCustomer);
+
+            document.getElementById("customerForm").reset();
+            showCustomerDetail(newCustomer); // Navigate to detail view after adding
+        };
+
+        const displayCustomers = () => {
+            const customerList = document.getElementById("customers");
+            customerList.innerHTML = "";
+            customers.forEach(customer => {
+                const li = document.createElement("li");
+                li.textContent = customer.name;
+                li.onclick = () => showCustomerDetail(customer);
+                const deleteButton = document.createElement("button");
+                deleteButton.textContent = "Delete";
+                deleteButton.onclick = (e) => {
+                    e.stopPropagation();
+                    deleteCustomer(customer.id);
+                };
+                li.appendChild(deleteButton);
+                customerList.appendChild(li);
+            });
+        };
+
+        const showCustomerDetail = (customer) => {
+            document.getElementById("home").classList.add("hidden");
+            document.getElementById("customerList").classList.add("hidden");
+            document.getElementById("addCustomer").classList.add("hidden");
+            document.getElementById("customerDetail").classList.remove("hidden");
+
+            document.getElementById("detailName").textContent = `Name: ${customer.name}`;
+            document.getElementById("detailDOB").textContent = `Date of Birth: ${new Date(customer.dateOfBirth).toLocaleDateString()}`;
+            document.getElementById("detailMemberNumber").textContent = `Member Number: ${customer.memberNumber}`;
+            document.getElementById("detailInterests").textContent = `Interests: ${customer.interests}`;
+        };
+
+        const deleteCustomer = (id) => {
+            customers = customers.filter(customer => customer.id !== id);
+            displayCustomers();
+        };
+    </script>
+</body>
+</html>
